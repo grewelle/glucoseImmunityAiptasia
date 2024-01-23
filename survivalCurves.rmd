@@ -1,0 +1,56 @@
+---
+title: "SurvivalPlots"
+author: "Richard"
+date: "January 19, 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("ggplot2")) install.packages("ggplot2"); library(ggplot2)
+if (!require("survminer")) install.packages("survminer"); library(survminer)
+if (!require("survival")) install.packages("survival"); library(survival)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r survivalFit}
+abs_file_path <- "C:/Users/Richard/Desktop/GlucoseLimitation/"
+data <- read.csv(paste(abs_file_path, "survivalTemplate.csv", sep = ""), fileEncoding="UTF-8-BOM")
+summary(data)
+times <- data$Day
+event <- data$Event
+treatment <- data$Treatment
+fit <- survfit(Surv(times, event) ~ treatment,
+               data = data)
+fit
+```
+
+```{r plotFit}
+
+png(file="C:/Users/Richard/Desktop/GlucoseLimitation/FullExp/larvae_fullexp_lowlive.png",
+width=1200, height=800)
+ggsurvplot(
+   fit,                     # survfit object with calculated statistics.
+   data = data,  # data used to fit survival curves. 
+   risk.table = FALSE,       # show risk table.
+   pval = TRUE,             # show p-value of log-rank test.
+   conf.int = TRUE,         # show confidence intervals for 
+                            # point estimaes of survival curves.
+   conf.int.alpha = 0.1,
+   xlim = c(0,7),        # present narrower X axis, but not affect
+                            # survival estimates.
+   ggtheme = theme_minimal(), # customize plot and risk table with a theme
+   font.x = 28,
+   font.y = 28,
+   font.tickslab = 28,
+   font.subtitle = 28,
+   font.legend = 20,
+   size = 3
+)
+dev.off()
+```
